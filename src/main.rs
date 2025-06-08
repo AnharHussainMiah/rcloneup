@@ -1,7 +1,6 @@
 use anyhow::{bail, Context, Result};
 use clap::Parser;
 use std::{
-    env,
     fs,
     io::{BufRead, BufReader, Write},
     os::unix::fs::PermissionsExt,
@@ -15,35 +14,27 @@ struct Args {
     /// Local directory to back up
     #[arg(long, default_value = "/path/to/backup/source", env = "BACKUP_SOURCE")]
     source: String,
-
     /// Rclone remote name
     #[arg(long, default_value = "minio", env = "RCLONE_REMOTE")]
     remote: String,
-
     /// Remote bucket/container name
-    #[arg(long, default_value = "backup-bucket", env = "REMOTE_BUCKET")]
+    #[arg(long, default_value = "", env = "REMOTE_BUCKET")]
     bucket: String,
-
     /// MinIO server endpoint URL
-    #[arg(long, default_value = "http://minio.local:9000", env = "MINIO_ENDPOINT")]
+    #[arg(long, default_value = "http://localhost:9000", env = "MINIO_ENDPOINT")]
     endpoint: String,
-
     /// MinIO access key (required)
     #[arg(long, env = "MINIO_ACCESS_KEY")]
     access_key: String,
-
     /// MinIO secret key (required)
     #[arg(long, env = "MINIO_SECRET_KEY")]
     secret_key: String,
-
     /// Cron schedule expression (default hourly)
     #[arg(long, default_value = "0 * * * *", env = "CRON_SCHEDULE")]
     cron: String,
-
     /// Enable verbose logging
     #[arg(long, short, default_value_t = false)]
     verbose: bool,
-
     /// Dry-run mode (show actions without making changes)
     #[arg(long, short, default_value_t = false)]
     dry_run: bool,
@@ -77,10 +68,17 @@ fn main() -> Result<()> {
     }
 
     if !args.dry_run {
-        fs::create_dir_all(&rclone_config_dir)
-            .with_context(|| format!("Failed to create rclone config directory {:?}", rclone_config_dir))?;
+        fs::create_dir_all(&rclone_config_dir).with_context(|| {
+            format!(
+                "Failed to create rclone config directory {:?}",
+                rclone_config_dir
+            )
+        })?;
     } else if args.verbose {
-        println!("(dry-run) Would create directory: {}", rclone_config_dir.display());
+        println!(
+            "(dry-run) Would create directory: {}",
+            rclone_config_dir.display()
+        );
     }
 
     let config_content = format!(
@@ -99,12 +97,20 @@ endpoint = {endpoint}
     );
 
     if args.dry_run {
-        println!("(dry-run) Would write rclone config file to: {}", rclone_config_file.display());
+        println!(
+            "(dry-run) Would write rclone config file to: {}",
+            rclone_config_file.display()
+        );
         if args.verbose {
             println!("--- rclone.conf content ---\n{}", config_content);
         }
     } else {
-        write_if_changed(&rclone_config_file, config_content.as_bytes(), 0o600, args.verbose)?;
+        write_if_changed(
+            &rclone_config_file,
+            config_content.as_bytes(),
+            0o600,
+            args.verbose,
+        )?;
     }
 
     let script_content = format!(
@@ -117,16 +123,27 @@ rclone sync "{source}" "{remote}:{bucket}" --log-file="$HOME/rclone_backup.log" 
     );
 
     if args.dry_run {
-        println!("(dry-run) Would write backup script to: {}", backup_script.display());
+        println!(
+            "(dry-run) Would write backup script to: {}",
+            backup_script.display()
+        );
         if args.verbose {
             println!("--- backup script content ---\n{}", script_content);
         }
     } else {
-        write_if_changed(&backup_script, script_content.as_bytes(), 0o755, args.verbose)?;
+        write_if_changed(
+            &backup_script,
+            script_content.as_bytes(),
+            0o755,
+            args.verbose,
+        )?;
     }
 
     if args.dry_run {
-        println!("(dry-run) Would update crontab to run backup script with schedule: '{}'", args.cron);
+        println!(
+            "(dry-run) Would update crontab to run backup script with schedule: '{}'",
+            args.cron
+        );
     } else {
         update_cron_job(&backup_script, &args.cron, args.verbose)?;
     }
@@ -152,7 +169,10 @@ fn validate_args(args: &Args) -> Result<()> {
     }
     // Basic cron schedule check (very basic)
     if args.cron.trim().split_whitespace().count() != 5 {
-        bail!("Cron schedule must have exactly 5 fields, got '{}'", args.cron);
+        bail!(
+            "Cron schedule must have exactly 5 fields, got '{}'",
+            args.cron
+        );
     }
     Ok(())
 }
@@ -226,7 +246,10 @@ fn update_cron_job(script_path: &PathBuf, cron_schedule: &str, verbose: bool) ->
         .context("Failed to spawn crontab command")?;
 
     {
-        let stdin = crontab_process.stdin.as_mut().context("Failed to open stdin")?;
+        let stdin = crontab_process
+            .stdin
+            .as_mut()
+            .context("Failed to open stdin")?;
         for line in &lines {
             writeln!(stdin, "{}", line)?;
         }
