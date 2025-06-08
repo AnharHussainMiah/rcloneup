@@ -71,23 +71,23 @@ export MINIO_SECRET_KEY=mysecretkey
 ## What happens when you run rcloneup?
 
 Checks if rclone is installed in your system
-Creates or updates the ~/.config/rclone/rclone.conf file with your MinIO credentials
-Creates or updates a shell script ~/rclone_backup.sh that runs rclone sync to your bucket
+Creates or updates the `~/.config/rclone/rclone.conf` file with your MinIO credentials
+Creates or updates a shell script `~/rclone_backup.sh` that runs rclone sync to your bucket
 Installs or updates a cron job that runs the backup script according to your schedule
 
 ## Safety notes
 
-The tool is idempotent — running it multiple times won’t overwrite existing configuration unnecessarily
-Credentials are saved in ~/.config/rclone/rclone.conf — keep this file secure and avoid sharing
-Use the --dry-run flag to preview changes before applying them
-Review your cron jobs with crontab -l to confirm the backup schedule
+The tool is idempotent — running it multiple times won’t overwrite existing configuration unnecessarily.
+Credentials are saved in `~/.config/rclone/rclone.conf` — keep this file secure and avoid sharing
+Use the `--dry-run` flag to preview changes before applying them
+Review your cron jobs with `crontab -l` to confirm the backup schedule
 
 ## Troubleshooting
 
-If backups aren’t running as expected, check the log at ~/rclone_backup.log
+If backups aren’t running as expected, check the log at `~/rclone_backup.log`
 Make sure rclone is installed and accessible (rclone --version)
 Verify your MinIO endpoint and credentials are correct
-Use --verbose mode to see detailed output when running the tool
+Use `--verbose` mode to see detailed output when running the tool
 
 ## Contributing
 
