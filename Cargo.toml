@@ -1,0 +1,11 @@
+[package]
+name = "rcloneup"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.98"
+clap = { version = "4.5", features = ["derive", "env"] }
+clap_derive = "4.5.18"
+dirs = "5.0"
+which = "6.0"
