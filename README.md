@@ -22,7 +22,10 @@ Rust is not required to run the compiled binary, but needed if you want to build
 ## 📦 Installation
 
 You can either:
-Download a prebuilt binary (coming soon!)
+Download a prebuilt binary [downloads](https://github.com/AnharHussainMiah/rcloneup/releases)
+
+OR
+
 Build from source using Rust:
 
 ```shell
