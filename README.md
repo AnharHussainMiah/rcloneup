@@ -101,8 +101,6 @@ This project is licensed under the MIT License.
 
 Inspired by the Rust ecosystem’s simplicity and the power of rclone.
 
-If you want, I can help generate a ready-to-go markdown file or GitHub repository structure next!
-
 ## AI Assistance Disclosure
 
 Parts of this project, including code examples and initial implementations, were generated with assistance from an AI language model (OpenAI's ChatGPT). The generated code has been reviewed, tested, and heavily adapted to fit the project requirements.
